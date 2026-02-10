@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { auctionItems, categories } from "@/data/mockData";
+import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, Loader2, RefreshCw } from "lucide-react";
+import { categories } from "@/data/mockData";
+import { AuctionItem as UIAuctionItem } from "@/types/auction";
+import { getAuctions } from "@/services/auctionService";
 import ItemCard from "@/components/auction/ItemCard";
 
 const ITEMS_PER_PAGE = 12;
@@ -17,8 +19,31 @@ const SearchPage = () => {
   const [sortBy, setSortBy] = useState("relevant");
   const [page, setPage] = useState(1);
 
-  // Simple mock filtering
-  const filtered = auctionItems.filter((item) => {
+  // Live data state
+  const [allItems, setAllItems] = useState<UIAuctionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch auctions from backend
+  useEffect(() => {
+    const fetchAuctions = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await getAuctions(1, 100); // Fetch a large batch for client-side filtering
+        setAllItems(response.data);
+      } catch (err: any) {
+        console.error("Failed to fetch auctions:", err);
+        setError(err.message || "Failed to load auctions");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAuctions();
+  }, []);
+
+  // Client-side filtering
+  const filtered = allItems.filter((item) => {
     const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword.toLowerCase());
     const matchesCategory = !selectedCategory || item.category === selectedCategory;
     return matchesKeyword && matchesCategory;
@@ -123,31 +148,54 @@ const SearchPage = () => {
 
         {/* Results */}
         <div className="flex-1">
-          <p className="text-sm text-muted-foreground mb-4">{sorted.length} results{keyword && ` for "${keyword}"`}{selectedCategory && ` in ${selectedCategory}`}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {paged.map((item) => <ItemCard key={item.id} item={item} />)}
-          </div>
-          {paged.length === 0 && (
-            <div className="text-center py-20 text-muted-foreground">
-              <p className="text-lg font-serif">No items found</p>
-              <p className="text-sm mt-1">Try adjusting your filters</p>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+              <p className="text-sm text-muted-foreground">Loading auctions...</p>
             </div>
-          )}
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
-              <button disabled={page === 1} onClick={() => setPage(page - 1)} className="h-9 w-9 rounded-md border border-input flex items-center justify-center disabled:opacity-30">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button key={p} onClick={() => setPage(p)} className={`h-9 w-9 rounded-md text-sm font-medium ${p === page ? "bg-primary text-primary-foreground" : "border border-input hover:bg-muted"}`}>
-                  {p}
-                </button>
-              ))}
-              <button disabled={page === totalPages} onClick={() => setPage(page + 1)} className="h-9 w-9 rounded-md border border-input flex items-center justify-center disabled:opacity-30">
-                <ChevronRight className="h-4 w-4" />
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-16 h-16 rounded-full bg-urgency/10 flex items-center justify-center mb-4">
+                <X className="h-8 w-8 text-urgency" />
+              </div>
+              <p className="text-lg font-serif font-semibold text-foreground mb-1">Failed to load auctions</p>
+              <p className="text-sm text-muted-foreground mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="h-9 px-6 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" /> Try Again
               </button>
             </div>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground mb-4">{sorted.length} results{keyword && ` for "${keyword}"`}{selectedCategory && ` in ${selectedCategory}`}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {paged.map((item) => <ItemCard key={item.id} item={item} />)}
+              </div>
+              {paged.length === 0 && (
+                <div className="text-center py-20 text-muted-foreground">
+                  <p className="text-lg font-serif">No items found</p>
+                  <p className="text-sm mt-1">Try adjusting your filters</p>
+                </div>
+              )}
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                  <button disabled={page === 1} onClick={() => setPage(page - 1)} className="h-9 w-9 rounded-md border border-input flex items-center justify-center disabled:opacity-30">
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <button key={p} onClick={() => setPage(p)} className={`h-9 w-9 rounded-md text-sm font-medium ${p === page ? "bg-primary text-primary-foreground" : "border border-input hover:bg-muted"}`}>
+                      {p}
+                    </button>
+                  ))}
+                  <button disabled={page === totalPages} onClick={() => setPage(page + 1)} className="h-9 w-9 rounded-md border border-input flex items-center justify-center disabled:opacity-30">
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

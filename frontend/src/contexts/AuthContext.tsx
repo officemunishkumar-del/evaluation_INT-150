@@ -36,6 +36,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         checkAuth();
     }, []);
 
+    // Listen for forced logout from API layer (401 responses)
+    useEffect(() => {
+        const handleForceLogout = () => {
+            setUser(null);
+        };
+        window.addEventListener("auth:logout", handleForceLogout);
+        return () => window.removeEventListener("auth:logout", handleForceLogout);
+    }, []);
+
     const login = async (email: string, password: string) => {
         const response = await authLogin({ email, password });
         setUser(response.user);

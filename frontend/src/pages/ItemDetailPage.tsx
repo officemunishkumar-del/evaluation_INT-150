@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Lock, Star, AlertTriangle, Wifi, WifiOff, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock, Star, AlertTriangle, Wifi, WifiOff, Loader2, Search, Home } from "lucide-react";
 import { AuctionItem as UIAuctionItem } from "@/types/auction";
 import { formatCurrency, getTimeRemaining } from "@/utils/formatters";
 import CountdownTimer from "@/components/auction/CountdownTimer";
@@ -163,9 +163,20 @@ const ItemDetailPage = () => {
 
   if (!item) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-serif font-bold mb-4">Item Not Found</h1>
-        <Link to="/search" className="text-primary hover:underline">Return to Search</Link>
+      <div className="container mx-auto px-4 py-20 text-center max-w-md">
+        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+          <Search className="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h1 className="text-2xl font-serif font-bold mb-2 text-foreground">Item Not Found</h1>
+        <p className="text-muted-foreground mb-6">This auction may have been removed or the link may be incorrect.</p>
+        <div className="flex gap-3 justify-center">
+          <Link to="/" className="h-10 px-5 rounded-md bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:bg-primary/90 transition-colors">
+            <Home className="h-4 w-4" /> Home
+          </Link>
+          <Link to="/search" className="h-10 px-5 rounded-md border border-input text-sm font-semibold flex items-center gap-2 hover:bg-muted transition-colors">
+            <Search className="h-4 w-4" /> Browse Auctions
+          </Link>
+        </div>
       </div>
     );
   }
@@ -279,7 +290,16 @@ const ItemDetailPage = () => {
           <div className="lg:col-span-2">
             <div className="flex gap-3">
               <div className="relative flex-1 aspect-square rounded-lg overflow-hidden bg-muted">
-                <img src={item.images[mainImgIdx]} alt={item.title} className="w-full h-full object-contain" />
+                <img
+                  src={item.images[mainImgIdx]}
+                  alt={item.title}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect fill='%23f3f4f6' width='600' height='600'/%3E%3Ctext x='50%25' y='48%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='64' fill='%239ca3af'%3E🖼%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='16' fill='%239ca3af'%3EImage unavailable%3C/text%3E%3C/svg%3E";
+                  }}
+                />
               </div>
             </div>
           </div>

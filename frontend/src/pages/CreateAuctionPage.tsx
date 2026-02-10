@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, Clock, DollarSign, Image, X, ChevronRight } from "lucide-react";
+import { Upload, Clock, DollarSign, Image, X, ChevronRight, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createAuction } from "@/services/auctionService";
 
@@ -18,6 +18,43 @@ const categoryOptions = [
     "Art", "Jewelry", "Furniture", "Coins", "Fashion", "Watches", "Asian Antiques", "Collectibles", "Home & Décor", "Books"
 ];
 
+interface FormErrors {
+    title?: string;
+    category?: string;
+    startingPrice?: string;
+    description?: string;
+}
+
+const validateForm = (formData: { title: string; description: string; category: string; startingPrice: string }): FormErrors => {
+    const errors: FormErrors = {};
+
+    if (!formData.title.trim()) {
+        errors.title = "Title is required";
+    } else if (formData.title.trim().length < 3) {
+        errors.title = "Title must be at least 3 characters";
+    } else if (formData.title.trim().length > 100) {
+        errors.title = "Title must be under 100 characters";
+    }
+
+    if (!formData.category) {
+        errors.category = "Please select a category";
+    }
+
+    if (!formData.startingPrice) {
+        errors.startingPrice = "Starting price is required";
+    } else if (parseFloat(formData.startingPrice) <= 0) {
+        errors.startingPrice = "Price must be greater than $0";
+    } else if (parseFloat(formData.startingPrice) > 10_000_000) {
+        errors.startingPrice = "Price seems too high — please double-check";
+    }
+
+    if (formData.description.length > 2000) {
+        errors.description = `Description too long (${formData.description.length}/2000)`;
+    }
+
+    return errors;
+};
+
 const CreateAuctionPage = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -31,10 +68,24 @@ const CreateAuctionPage = () => {
     });
     const [images, setImages] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error on change
+        if (errors[name as keyof FormErrors]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const handleBlur = (fieldName: string) => {
+        setTouched(prev => ({ ...prev, [fieldName]: true }));
+        const fieldErrors = validateForm(formData);
+        if (fieldErrors[fieldName as keyof FormErrors]) {
+            setErrors(prev => ({ ...prev, [fieldName]: fieldErrors[fieldName as keyof FormErrors] }));
+        }
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,10 +106,14 @@ const CreateAuctionPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.title || !formData.startingPrice || !formData.category) {
+        const validationErrors = validateForm(formData);
+        setErrors(validationErrors);
+        setTouched({ title: true, category: true, startingPrice: true, description: true });
+
+        if (Object.keys(validationErrors).length > 0) {
             toast({
-                title: "Missing fields",
-                description: "Please fill in all required fields",
+                title: "Please fix the errors",
+                description: "Some fields need your attention before submitting.",
                 variant: "destructive",
             });
             return;
@@ -98,6 +153,21 @@ const CreateAuctionPage = () => {
     const endTime = new Date();
     endTime.setHours(endTime.getHours() + formData.duration);
 
+    const renderFieldError = (field: keyof FormErrors) => {
+        if (!touched[field] || !errors[field]) return null;
+        return (
+            <p className="text-xs text-urgency mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> {errors[field]}
+            </p>
+        );
+    };
+
+    const fieldClass = (field: keyof FormErrors) =>
+        touched[field] && errors[field] ? "border-urgency focus:ring-urgency/30" : "border-input";
+
+    const descCharCount = formData.description.length;
+    const descNearLimit = descCharCount > 1800;
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             {/* Header */}
@@ -120,9 +190,12 @@ const CreateAuctionPage = () => {
                                 name="title"
                                 value={formData.title}
                                 onChange={handleInputChange}
+                                onBlur={() => handleBlur("title")}
                                 placeholder="e.g., Vintage Rolex Submariner 1967"
-                                className="w-full h-11 px-4 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                maxLength={100}
+                                className={`w-full h-11 px-4 rounded-md border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${fieldClass("title")}`}
                             />
+                            {renderFieldError("title")}
                         </div>
 
                         {/* Category */}
@@ -134,13 +207,15 @@ const CreateAuctionPage = () => {
                                 name="category"
                                 value={formData.category}
                                 onChange={handleInputChange}
-                                className="w-full h-11 px-4 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                onBlur={() => handleBlur("category")}
+                                className={`w-full h-11 px-4 rounded-md border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${fieldClass("category")}`}
                             >
                                 <option value="">Select a category</option>
                                 {categoryOptions.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
                             </select>
+                            {renderFieldError("category")}
                         </div>
 
                         {/* Description */}
@@ -152,10 +227,18 @@ const CreateAuctionPage = () => {
                                 name="description"
                                 value={formData.description}
                                 onChange={handleInputChange}
+                                onBlur={() => handleBlur("description")}
                                 rows={5}
+                                maxLength={2000}
                                 placeholder="Describe your item in detail. Include condition, provenance, dimensions, and any notable features..."
-                                className="w-full px-4 py-3 rounded-md border border-input bg-background text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                                className={`w-full px-4 py-3 rounded-md border bg-background text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring ${fieldClass("description")}`}
                             />
+                            <div className="flex justify-between mt-1">
+                                {renderFieldError("description") || <span />}
+                                <span className={`text-xs ${descNearLimit ? "text-warning" : "text-muted-foreground"}`}>
+                                    {descCharCount}/2000
+                                </span>
+                            </div>
                         </div>
 
                         {/* Images */}
@@ -208,12 +291,14 @@ const CreateAuctionPage = () => {
                                         name="startingPrice"
                                         value={formData.startingPrice}
                                         onChange={handleInputChange}
+                                        onBlur={() => handleBlur("startingPrice")}
                                         min="1"
                                         step="1"
                                         placeholder="0.00"
-                                        className="w-full h-11 pl-9 pr-4 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                        className={`w-full h-11 pl-9 pr-4 rounded-md border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${fieldClass("startingPrice")}`}
                                     />
                                 </div>
+                                {renderFieldError("startingPrice")}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-foreground mb-2">
