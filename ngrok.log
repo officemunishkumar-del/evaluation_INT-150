@@ -9,3 +9,37 @@ t=2026-02-11T14:43:52+0530 lvl=info msg="started tunnel" obj=tunnels name=comman
 t=2026-02-11T14:43:52+0530 lvl=info msg="update available" obj=updater
 t=2026-02-11T14:44:24+0530 lvl=info msg="join connections" obj=join id=a5dadb52eacd l=127.0.0.1:3000 r=14.99.117.194:34890
 t=2026-02-11T14:44:24+0530 lvl=info msg="join connections" obj=join id=b0b5d6c0bb39 l=127.0.0.1:3000 r=14.99.117.194:34890
+t=2026-02-11T14:50:26+0530 lvl=info msg="join connections" obj=join id=d417a2582349 l=127.0.0.1:3000 r=125.21.216.158:45862
+t=2026-02-11T14:50:34+0530 lvl=info msg="join connections" obj=join id=76b8ed5ba491 l=127.0.0.1:3000 r=125.21.216.158:45862
+t=2026-02-11T14:50:42+0530 lvl=info msg="join connections" obj=join id=736db75efea2 l=127.0.0.1:3000 r=125.21.216.158:45862
+t=2026-02-11T14:50:47+0530 lvl=info msg="join connections" obj=join id=b59694b48203 l=127.0.0.1:3000 r=125.21.216.158:45862
+t=2026-02-11T14:51:34+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=be682b2a18a7 clientid=456da1f9d32ba2e8e5c0803cc9e58fdd
+t=2026-02-11T14:51:34+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=d878f72b1ee9 err="session closed"
+t=2026-02-11T14:51:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T14:51:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T14:51:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T14:51:38+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T14:51:42+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T14:51:51+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-02-11T14:51:51+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-02-11T14:54:51+0530 lvl=info msg="join connections" obj=join id=f6cef4a4855f l=127.0.0.1:3000 r=14.99.117.194:55374
+t=2026-02-11T14:55:55+0530 lvl=info msg="join connections" obj=join id=96f1062e8dcf l=127.0.0.1:3000 r=125.21.216.158:51850
+t=2026-02-11T14:57:13+0530 lvl=info msg="join connections" obj=join id=9b1b6e8e9784 l=127.0.0.1:3000 r=125.21.216.158:58942
+t=2026-02-11T15:07:31+0530 lvl=info msg=start pg=/api/tunnels id=f27ae993552e1d9a
+t=2026-02-11T15:07:31+0530 lvl=info msg=end pg=/api/tunnels id=f27ae993552e1d9a status=200 dur=311.68µs
+t=2026-02-11T15:08:49+0530 lvl=info msg="join connections" obj=join id=d313da8315e7 l=127.0.0.1:3000 r=125.21.216.158:51018
+t=2026-02-11T15:09:46+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=f52e5f3a61b7 clientid=456da1f9d32ba2e8e5c0803cc9e58fdd
+t=2026-02-11T15:09:46+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=d878f72b1ee9 err="session closed"
+t=2026-02-11T15:09:46+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T15:09:47+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T15:09:48+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T15:09:50+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T15:09:54+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T15:10:02+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com on 127.0.0.53:53: server misbehaving"
+t=2026-02-11T15:10:18+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-02-11T15:10:18+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-02-11T15:11:32+0530 lvl=info msg="join connections" obj=join id=b68408d0c2d0 l=127.0.0.1:3000 r=112.196.81.250:52540
+t=2026-02-11T15:15:32+0530 lvl=info msg="join connections" obj=join id=9ace798915a5 l=127.0.0.1:3000 r=125.21.216.158:33338
+t=2026-02-11T15:17:30+0530 lvl=info msg="join connections" obj=join id=a95fcddb000d l=127.0.0.1:3000 r=112.196.81.250:59100
+t=2026-02-11T15:20:46+0530 lvl=info msg="join connections" obj=join id=68ea0f75fc46 l=127.0.0.1:3000 r=112.196.81.250:51378
+t=2026-02-11T15:20:53+0530 lvl=info msg="join connections" obj=join id=64b8ed1c86ae l=127.0.0.1:3000 r=112.196.81.250:51378
